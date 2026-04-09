@@ -100,7 +100,7 @@ function renderExpensesTable() {
             <td>${formatDate(exp.date)}</td>
             <td>${exp.name}</td>
             <td><span class="cat-badge">${exp.category}</span></td>
-            <td>${formatDate(exp.dueDate || exp.date)}</td>
+            <td>Dia ${exp.dueDate || '-'}</td>
             <td class="text-right">R$ ${parseFloat(exp.value).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
             <td class="text-center">
                 <span class="status-badge ${exp.isPaid ? 'status-paid' : 'status-pending'}" onclick="togglePaidStatus('${exp.id}')">
@@ -250,7 +250,7 @@ function addExpense(name, value, category, dueDate, isPaid) {
         name,
         value: parseFloat(value),
         category,
-        dueDate: dueDate || new Date().toISOString().split('T')[0],
+        dueDate: dueDate || '1',
         isPaid: isPaid ?? false,
         date: new Date().toISOString()
     };

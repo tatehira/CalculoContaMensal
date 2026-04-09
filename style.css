@@ -442,6 +442,8 @@ td {
     width: 450px;
     padding: 2rem;
     position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal header {
@@ -485,6 +487,11 @@ input, select {
 
 input:focus, select:focus {
     border-color: var(--accent-blue);
+}
+
+select option {
+    background: #1a1b3a; /* Dark background for options */
+    color: white;
 }
 
 .btn-submit {
