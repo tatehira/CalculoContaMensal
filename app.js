@@ -16,14 +16,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- Data Persistence ---
 function loadData() {
-    const saved = localStorage.getItem('finanzflow_data');
+    const oldSaved = localStorage.getItem('finanzflow_data');
+    const saved = localStorage.getItem('tatehirapay_data');
+    
     if (saved) {
         state = JSON.parse(saved);
+    } else if (oldSaved) {
+        // Migration
+        state = JSON.parse(oldSaved);
+        saveData();
     }
 }
 
 function saveData() {
-    localStorage.setItem('finanzflow_data', JSON.stringify(state));
+    localStorage.setItem('tatehirapay_data', JSON.stringify(state));
 }
 
 // --- Logic ---
@@ -301,7 +307,7 @@ function exportData() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
     const downloadAnchorNode = document.createElement('a');
     downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", "finanzflow_backup.json");
+    downloadAnchorNode.setAttribute("download", "tatehirapay_backup.json");
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
