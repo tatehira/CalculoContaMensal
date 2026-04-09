@@ -29,9 +29,14 @@ function saveData() {
 // --- Logic ---
 function calculateTotals() {
     const totalExpenses = state.expenses.reduce((sum, exp) => sum + parseFloat(exp.value), 0);
+    const paidTotal = state.expenses.filter(e => e.isPaid).reduce((sum, exp) => sum + parseFloat(exp.value), 0);
+    const unpaidTotal = totalExpenses - paidTotal;
     const balance = state.initialValue - totalExpenses;
+    
     return {
         totalExpenses,
+        paidTotal,
+        unpaidTotal,
         balance,
         percentageUsed: state.initialValue > 0 ? (totalExpenses / state.initialValue) * 100 : 0
     };
@@ -45,6 +50,8 @@ function renderAll() {
     document.getElementById('val-initial').textContent = formatCurrency(state.initialValue);
     document.getElementById('val-total-expenses').textContent = formatCurrency(totals.totalExpenses);
     document.getElementById('val-balance').textContent = formatCurrency(totals.balance);
+    document.getElementById('val-paid').textContent = formatCurrency(totals.paidTotal);
+    document.getElementById('val-unpaid').textContent = formatCurrency(totals.unpaidTotal);
 
     // Update Progress Bar
     const progressBar = document.getElementById('budget-progress');
@@ -75,7 +82,7 @@ function renderExpensesTable() {
     );
 
     if (filtered.length === 0) {
-        list.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 2rem; color: var(--text-secondary)">Nenhum gasto encontrado.</td></tr>`;
+        list.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--text-secondary)">Nenhum gasto encontrado.</td></tr>`;
         return;
     }
 
@@ -87,7 +94,14 @@ function renderExpensesTable() {
             <td>${formatDate(exp.date)}</td>
             <td>${exp.name}</td>
             <td><span class="cat-badge">${exp.category}</span></td>
+            <td>${formatDate(exp.dueDate || exp.date)}</td>
             <td class="text-right">R$ ${parseFloat(exp.value).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+            <td class="text-center">
+                <span class="status-badge ${exp.isPaid ? 'status-paid' : 'status-pending'}" onclick="togglePaidStatus('${exp.id}')">
+                    <i data-lucide="${exp.isPaid ? 'check' : 'clock'}"></i>
+                    ${exp.isPaid ? 'Pago' : 'Pendente'}
+                </span>
+            </td>
             <td class="text-center">
                 <button class="btn-delete" onclick="deleteExpense('${exp.id}')">
                     <i data-lucide="trash-2"></i>
@@ -121,7 +135,10 @@ function renderReport() {
             <h3>Resumo Geral</h3>
             <p>Saldo Inicial: R$ ${state.initialValue.toLocaleString('pt-BR')}</p>
             <p>Total de Gastos: R$ ${totals.totalExpenses.toLocaleString('pt-BR')}</p>
-            <p><strong>Saldo Final: R$ ${totals.balance.toLocaleString('pt-BR')}</strong></p>
+            <p>Total Pago: R$ ${totals.paidTotal.toLocaleString('pt-BR')}</p>
+            <p>Total Pendente: R$ ${totals.unpaidTotal.toLocaleString('pt-BR')}</p>
+            <p><strong>Saldo Final (Real): R$ ${totals.balance.toLocaleString('pt-BR')}</strong></p>
+            <p><strong>Saldo Disponível (Sem pendências): R$ ${(state.initialValue - totals.paidTotal).toLocaleString('pt-BR')}</strong></p>
         </div>
         <div>
             <h3>Por Categoria</h3>
@@ -196,8 +213,10 @@ function setupEventListeners() {
         const name = document.getElementById('exp-name').value;
         const value = document.getElementById('exp-value').value;
         const category = document.getElementById('exp-category').value;
+        const dueDate = document.getElementById('exp-due-date').value;
+        const isPaid = document.getElementById('exp-status').value === 'true';
         
-        addExpense(name, value, category);
+        addExpense(name, value, category, dueDate, isPaid);
         e.target.reset();
         closeModal();
     });
@@ -219,18 +238,29 @@ function setupEventListeners() {
 }
 
 // --- Actions ---
-function addExpense(name, value, category) {
+function addExpense(name, value, category, dueDate, isPaid) {
     const newExp = {
         id: Date.now().toString(),
         name,
         value: parseFloat(value),
         category,
+        dueDate: dueDate || new Date().toISOString().split('T')[0],
+        isPaid: isPaid ?? false,
         date: new Date().toISOString()
     };
     state.expenses.push(newExp);
     saveData();
     renderAll();
 }
+
+window.togglePaidStatus = function(id) {
+    const exp = state.expenses.find(e => e.id === id);
+    if (exp) {
+        exp.isPaid = !exp.isPaid;
+        saveData();
+        renderAll();
+    }
+};
 
 window.deleteExpense = function(id) {
     state.expenses = state.expenses.filter(e => e.id !== id);

@@ -91,6 +91,29 @@
                     </div>
                 </div>
 
+                <div class="top-cards mini-cards">
+                    <div class="card glass small-card">
+                        <div class="card-icon income small"><i data-lucide="check-circle"></i></div>
+                        <div class="card-info">
+                            <span class="label">Total Pago</span>
+                            <div class="value-container">
+                                <span class="currency">R$</span>
+                                <span id="val-paid" class="value small">0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card glass small-card">
+                        <div class="card-icon expense small"><i data-lucide="clock"></i></div>
+                        <div class="card-info">
+                            <span class="label">Pendente</span>
+                            <div class="value-container">
+                                <span class="currency">R$</span>
+                                <span id="val-unpaid" class="value small">0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="charts-grid">
                     <div class="chart-card glass">
                         <h3>Distribuição de Gastos</h3>
@@ -120,12 +143,13 @@
                     <div class="table-wrapper">
                         <table id="expenses-table">
                             <thead>
-                                border="0"
                                 <tr>
-                                    <th>Data</th>
+                                    <th>Criação</th>
                                     <th>Descrição</th>
                                     <th>Categoria</th>
+                                    <th>Vencimento</th>
                                     <th class="text-right">Valor</th>
+                                    <th class="text-center">Status</th>
                                     <th class="text-center">Ações</th>
                                 </tr>
                             </thead>
@@ -175,6 +199,19 @@
                     <div class="form-group">
                         <label>Categoria</label>
                         <input type="text" id="exp-category" placeholder="Ex: Moradia, Alimentação" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Data de Vencimento</label>
+                        <input type="date" id="exp-due-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Status Inicial</label>
+                        <select id="exp-status">
+                            <option value="false">Pendente</option>
+                            <option value="true">Pago</option>
+                        </select>
                     </div>
                 </div>
                 <button type="submit" class="btn-submit">Salvar Gasto</button>
