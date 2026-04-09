@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanzFlow | Controle Inteligente</title>
+    <!-- SEO -->
+    <meta name="description" content="Sistema de controle financeiro pessoal simples, seguro e sem necessidade de banco de dados.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar/Nav -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i data-lucide="layout-dashboard"></i>
+                <span>FinanzFlow</span>
+            </div>
+            <nav>
+                <button class="nav-item active" id="nav-dashboard">
+                    <i data-lucide="pie-chart"></i> Dashboard
+                </button>
+                <button class="nav-item" id="nav-transactions">
+                    <i data-lucide="list"></i> Transações
+                </button>
+                <button class="nav-item" id="nav-reports">
+                    <i data-lucide="file-text"></i> Relatórios
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="btn-export-data">
+                    <i data-lucide="download"></i> Exportar JSON
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header>
+                <div class="welcome">
+                    <h1 id="page-title">Dashboard</h1>
+                    <p id="page-subtitle">Bem-vindo de volta, organize suas finanças hoje.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-primary" id="btn-new-expense">
+                        <i data-lucide="plus"></i> Novo Gasto
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="section-dashboard" class="content-section">
+                <div class="top-cards">
+                    <div class="card glass">
+                        <div class="card-icon income"><i data-lucide="wallet"></i></div>
+                        <div class="card-info">
+                            <span class="label">Saldo Inicial</span>
+                            <div class="value-container">
+                                <span class="currency">R$</span>
+                                <span id="val-initial" class="value">0,00</span>
+                                <button id="btn-edit-initial" class="icon-btn"><i data-lucide="edit-2"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card glass">
+                        <div class="card-icon expense"><i data-lucide="trending-down"></i></div>
+                        <div class="card-info">
+                            <span class="label">Total Gastos</span>
+                            <div class="value-container">
+                                <span class="currency">R$</span>
+                                <span id="val-total-expenses" class="value">0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card glass highlight">
+                        <div class="card-icon balance"><i data-lucide="zap"></i></div>
+                        <div class="card-info">
+                            <span class="label">Restante</span>
+                            <div class="value-container">
+                                <span class="currency">R$</span>
+                                <span id="val-balance" class="value">0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-card glass">
+                        <h3>Distribuição de Gastos</h3>
+                        <canvas id="chart-pie"></canvas>
+                    </div>
+                    <div class="chart-card glass">
+                        <h3>Status do Orçamento</h3>
+                        <div class="progress-container">
+                            <div class="progress-bar-bg">
+                                <div id="budget-progress" class="progress-bar" style="width: 0%"></div>
+                            </div>
+                            <span id="budget-text">0% do limite atingido</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Transactions Section -->
+            <section id="section-transactions" class="content-section hidden">
+                <div class="table-card glass">
+                    <div class="table-header">
+                        <h2>Lista de Gastos</h2>
+                        <div class="filter-group">
+                            <input type="text" id="search-expenses" placeholder="Buscar por nome...">
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="expenses-table">
+                            <thead>
+                                border="0"
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Descrição</th>
+                                    <th>Categoria</th>
+                                    <th class="text-right">Valor</th>
+                                    <th class="text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenses-list">
+                                <!-- List populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+             <!-- Reports Section -->
+             <section id="section-reports" class="content-section hidden">
+                <div class="report-card glass">
+                    <div class="report-header">
+                        <h2>Relatório Mensal</h2>
+                        <button class="btn-secondary" onclick="window.print()">
+                            <i data-lucide="printer"></i> Imprimir
+                        </button>
+                    </div>
+                    <div id="report-content" class="report-body">
+                        <!-- Summary here -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-container" class="modal-backdrop hidden">
+        <!-- New Expense Modal -->
+        <div id="modal-expense" class="modal glass">
+            <header>
+                <h2>Registrar Gasto</h2>
+                <button class="close-modal"><i data-lucide="x"></i></button>
+            </header>
+            <form id="form-expense">
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <input type="text" id="exp-name" placeholder="Ex: Aluguel, Supermercado" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Valor (R$)</label>
+                        <input type="number" id="exp-value" step="0.01" placeholder="0,00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoria</label>
+                        <input type="text" id="exp-category" placeholder="Ex: Moradia, Alimentação" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">Salvar Gasto</button>
+            </form>
+        </div>
+
+        <!-- Initial Value Modal -->
+        <div id="modal-initial" class="modal glass">
+            <header>
+                <h2>Definir Saldo Mensal</h2>
+                <button class="close-modal"><i data-lucide="x"></i></button>
+            </header>
+            <form id="form-initial">
+                <div class="form-group">
+                    <label>Quanto você tem disponível este mês?</label>
+                    <input type="number" id="input-initial-val" step="0.01" placeholder="0,00" required>
+                </div>
+                <button type="submit" class="btn-submit">Confirmar Saldo</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Library Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
