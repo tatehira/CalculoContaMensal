@@ -60,7 +60,11 @@ function calculateTotals() {
         .reduce((sum, t) => sum + parseFloat(t.value), 0);
 
     const unpaidTotal = totalExpenses - paidTotal;
-    const balance = totalIncomes - totalExpenses;
+    
+    // Balance now means "Money effectively in pocket"
+    const realBalance = totalIncomes - paidTotal;
+    // Projected balance means "Money left after all bills are paid"
+    const projectedBalance = totalIncomes - totalExpenses;
     
     return {
         totalIncomes,
@@ -68,7 +72,8 @@ function calculateTotals() {
         totalExpenses,
         paidTotal,
         unpaidTotal,
-        balance,
+        realBalance,
+        projectedBalance,
         percentageUsed: totalIncomes > 0 ? (totalExpenses / totalIncomes) * 100 : 0
     };
 }
@@ -80,14 +85,16 @@ function renderAll() {
     // Update Top Cards
     document.getElementById('val-initial').textContent = formatCurrency(state.initialValue);
     document.getElementById('val-total-incomes').textContent = formatCurrency(totals.totalIncomes);
-    document.getElementById('val-total-expenses').textContent = formatCurrency(totals.totalExpenses);
-    document.getElementById('val-balance').textContent = formatCurrency(totals.balance);
+    // Primary 'Gastos' now shows what is LEFT to pay (abates when paid)
+    document.getElementById('val-total-expenses').textContent = formatCurrency(totals.unpaidTotal);
+    // Primary 'Balance' now shows REAL money (abates when paid)
+    document.getElementById('val-balance').textContent = formatCurrency(totals.realBalance);
     document.getElementById('val-paid').textContent = formatCurrency(totals.paidTotal);
     document.getElementById('val-unpaid').textContent = formatCurrency(totals.unpaidTotal);
 
     // Update Transaction Tab Summary
-    document.getElementById('tab-total-expenses').textContent = `- R$ ${formatCurrency(totals.totalExpenses)}`;
-    document.getElementById('tab-total-incomes').textContent = `+ R$ ${formatCurrency(totals.registeredIncomes)}`;
+    document.getElementById('tab-total-expenses').textContent = `Falta: R$ ${formatCurrency(totals.unpaidTotal)}`;
+    document.getElementById('tab-total-incomes').textContent = `Gasto: R$ ${formatCurrency(totals.paidTotal)}`;
     document.getElementById('transaction-count').textContent = `${state.transactions.length} registros no total`;
 
     // Update Progress Bar
@@ -196,12 +203,16 @@ function renderReport() {
                     <span class="value" style="color: var(--income)">R$ ${totals.totalIncomes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
                 </div>
                 <div class="report-stat-card">
-                    <span class="label">Total de Gastos</span>
-                    <span class="value" style="color: var(--expense)">R$ ${totals.totalExpenses.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                    <span class="label">Total Já Pago</span>
+                    <span class="value" style="color: var(--expense)">- R$ ${totals.paidTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
                 </div>
-                <div class="report-stat-cardHighlight" style="background: var(--gradient-primary); padding: 1.5rem; border-radius: 16px; margin-top: 1rem;">
-                    <span class="label" style="color: rgba(255,255,255,0.7)">Saldo Líquido</span>
-                    <span class="value" style="color: white; font-size: 1.8rem">R$ ${totals.balance.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                <div class="report-stat-cardHighlight" style="background: var(--gradient-primary); padding: 1.5rem; border-radius: 16px; margin-top: 1rem; margin-bottom: 1rem;">
+                    <span class="label" style="color: rgba(255,255,255,0.7)">Saldo Real (O que você tem)</span>
+                    <span class="value" style="color: white; font-size: 1.8rem">R$ ${totals.realBalance.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="report-stat-card" style="border-style: dashed; opacity: 0.8">
+                    <span class="label">Saldo Projetado (Após pagar tudo)</span>
+                    <span class="value" style="color: var(--text-primary)">R$ ${totals.projectedBalance.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
                 </div>
             </div>
             <div>
