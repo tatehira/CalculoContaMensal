@@ -49,8 +49,8 @@
                     <p id="page-subtitle">Bem-vindo de volta, organize suas finanças hoje.</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn-primary" id="btn-new-expense">
-                        <i data-lucide="plus"></i> Novo Gasto
+                    <button class="btn-primary" id="btn-new-transaction">
+                        <i data-lucide="plus"></i> Nova Transação
                     </button>
                 </div>
             </header>
@@ -79,10 +79,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="card glass">
+                        <div class="card-icon income"><i data-lucide="trending-up"></i></div>
+                        <div class="card-info">
+                            <span class="label">Total Receitas</span>
+                            <div class="value-container">
+                                <span class="currency">R$</span>
+                                <span id="val-total-incomes" class="value">0,00</span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card glass highlight">
                         <div class="card-icon balance"><i data-lucide="zap"></i></div>
                         <div class="card-info">
-                            <span class="label">Restante</span>
+                            <span class="label">Saldo Disponível</span>
                             <div class="value-container">
                                 <span class="currency">R$</span>
                                 <span id="val-balance" class="value">0,00</span>
@@ -133,11 +143,27 @@
 
             <!-- Transactions Section -->
             <section id="section-transactions" class="content-section hidden">
+                <div class="transaction-summary glass">
+                    <div class="summary-item">
+                        <span class="label">Total Gastos</span>
+                        <span id="tab-total-expenses" class="value expense">R$ 0,00</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="summary-item">
+                        <span class="label">Total Recebido</span>
+                        <span id="tab-total-incomes" class="value income">R$ 0,00</span>
+                    </div>
+                </div>
+
                 <div class="table-card glass">
                     <div class="table-header">
-                        <h2>Lista de Gastos</h2>
+                        <div class="title-group">
+                            <h2>Lista de Transações</h2>
+                            <p id="transaction-count">0 registros encontrados</p>
+                        </div>
                         <div class="filter-group">
-                            <input type="text" id="search-expenses" placeholder="Buscar por nome...">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="search-expenses" placeholder="Buscar por descrição ou categoria...">
                         </div>
                     </div>
                     <div class="table-wrapper">
@@ -180,39 +206,43 @@
 
     <!-- Modals -->
     <div id="modal-container" class="modal-backdrop hidden">
-        <!-- New Expense Modal -->
-        <div id="modal-expense" class="modal glass">
+        <!-- Transaction Modal (New/Edit) -->
+        <div id="modal-transaction" class="modal glass">
             <header>
-                <h2>Registrar Gasto</h2>
+                <h2 id="modal-title">Registrar Transação</h2>
                 <button class="close-modal"><i data-lucide="x"></i></button>
             </header>
-            <form id="form-expense">
+            <div class="type-toggle">
+                <button type="button" class="toggle-btn active" data-type="expense">Gasto</button>
+                <button type="button" class="toggle-btn" data-type="income">Ganho</button>
+            </div>
+            <form id="form-transaction">
                 <div class="form-group">
-                    <label>Descrição</label>
-                    <input type="text" id="exp-name" placeholder="Ex: Aluguel, Supermercado" required>
+                    <label id="lbl-name">Descrição</label>
+                    <input type="text" id="trans-name" placeholder="Ex: Aluguel, Freelance" required>
                 </div>
                 <div class="form-group">
                     <label>Valor (R$)</label>
-                    <input type="number" id="exp-value" step="0.01" placeholder="0,00" required>
+                    <input type="number" id="trans-value" step="0.01" placeholder="0,00" required>
                 </div>
                 <div class="form-group">
                     <label>Categoria</label>
-                    <input type="text" id="exp-category" placeholder="Ex: Moradia, Alimentação" required>
+                    <input type="text" id="trans-category" placeholder="Ex: Moradia, Trabalho" required>
                 </div>
-                <div class="form-row">
+                <div class="form-row" id="expense-extra-fields">
                     <div class="form-group">
                         <label>Dia do Vencimento</label>
-                        <input type="number" id="exp-due-date" min="1" max="31" placeholder="1-31" required>
+                        <input type="number" id="trans-due-date" min="1" max="31" placeholder="1-31">
                     </div>
                     <div class="form-group">
-                        <label>Status Inicial</label>
-                        <select id="exp-status">
+                        <label>Status</label>
+                        <select id="trans-status">
                             <option value="false">Pendente</option>
                             <option value="true">Pago</option>
                         </select>
                     </div>
                 </div>
-                <button type="submit" class="btn-submit">Salvar Gasto</button>
+                <button type="submit" id="btn-save-transaction" class="btn-submit">Salvar Transação</button>
             </form>
         </div>
 
